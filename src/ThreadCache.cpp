@@ -14,7 +14,7 @@ namespace Kama_memoryPool {
           return malloc(size);
       }
 
-      size_t index = SizeClass::getIndex(size);
+      size_t index = SizeClass::getIndex(size);   //调用函数得到
 
       // 更新自由链表大小
       freeListSize_[index]--;
@@ -30,26 +30,26 @@ namespace Kama_memoryPool {
       return fetchFromCentralCache(index);
   }
 
-void ThreadCache::deallocate(void* ptr, size_t size) {
-    if (size > MAX_BYTES) {
-        free(ptr);
-        return;
-    }
+	void ThreadCache::deallocate(void* ptr, size_t size) {
+			if (size > MAX_BYTES) {
+					free(ptr);
+					return;
+			}
 
-    size_t index = SizeClass::getIndex(size);
+			size_t index = SizeClass::getIndex(size);
 
-    // 插入到线程本地自由链表
-    *reinterpret_cast<void**>(ptr) = freeList_[index];
-    freeList_[index] = ptr;
+			// 插入到线程本地自由链表
+			*reinterpret_cast<void**>(ptr) = freeList_[index];
+			freeList_[index] = ptr;
 
-     // 更新自由链表大小
-    freeListSize_[index]++; // 增加对应大小类的自由链表大小
+			// 更新自由链表大小
+			freeListSize_[index]++; // 增加对应大小类的自由链表大小
 
-    // 判断是否需要将部分内存回收给中心缓存
-    if (shouldReturnToCentralCache(index)) {
-        returnToCentralCache(freeList_[index], size);
-    }
-}
+			// 判断是否需要将部分内存回收给中心缓存
+			if (shouldReturnToCentralCache(index)) {
+					returnToCentralCache(freeList_[index], size);
+			}
+	}
 
 // 判断是否需要将内存回收给中心缓存
   bool ThreadCache::shouldReturnToCentralCache(size_t index) {

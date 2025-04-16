@@ -23,7 +23,7 @@ namespace Kama_memoryPool  {
           return (bytes + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
       }
 
-      static size_t getIndex(size_t bytes) {   
+      static size_t getIndex(size_t bytes) {   // 将函数写到类中而不是写为全局函数 
           // 确保bytes至少为ALIGNMENT
           bytes = std::max(bytes, ALIGNMENT);
           // 向上取整后-1

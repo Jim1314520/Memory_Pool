@@ -2,11 +2,9 @@
 #include <sys/mman.h>
 #include <cstring>
 
-namespace Kama_memoryPool
-{
+namespace Kama_memoryPool {
 
-void* PageCache::allocateSpan(size_t numPages)
-{
+void* PageCache::allocateSpan(size_t numPages) {
     std::lock_guard<std::mutex> lock(mutex_);
 
     // 查找合适的空闲span
@@ -86,18 +84,15 @@ void PageCache::deallocateSpan(void* ptr, size_t numPages)
         auto& nextList = freeSpans_[nextSpan->numPages];
         
         // 检查是否是头节点
-        if (nextList == nextSpan)
-        {
+        if (nextList == nextSpan) {
             nextList = nextSpan->next;
             found = true;
         }
         else if (nextList) // 只有在链表非空时才遍历
         {
             Span* prev = nextList;
-            while (prev->next)
-            {
-                if (prev->next == nextSpan)
-                {   
+            while (prev->next) {
+                if (prev->next == nextSpan) {   
                     // 将nextSpan从空闲链表中移除
                     prev->next = nextSpan->next;
                     found = true;
@@ -108,8 +103,7 @@ void PageCache::deallocateSpan(void* ptr, size_t numPages)
         }
 
         // 2. 只有在找到nextSpan的情况下才进行合并
-        if (found)
-        {
+        if (found) {
             // 合并span
             span->numPages += nextSpan->numPages;
             spanMap_.erase(nextAddr);
@@ -123,18 +117,17 @@ void PageCache::deallocateSpan(void* ptr, size_t numPages)
     list = span;
 }
 
-void* PageCache::systemAlloc(size_t numPages)
-{
-    size_t size = numPages * PAGE_SIZE;
+  void* PageCache::systemAlloc(size_t numPages) {
+      size_t size = numPages * PAGE_SIZE;
 
-    // 使用mmap分配内存
-    void* ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (ptr == MAP_FAILED) return nullptr;
+      // 使用mmap分配内存
+      void* ptr = mmap(nullptr, size, PROT_READ | PROT_WRITE,
+                      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+      if (ptr == MAP_FAILED) return nullptr;
 
-    // 清零内存
-    memset(ptr, 0, size);
-    return ptr;
-}
+      // 清零内存
+      memset(ptr, 0, size);
+      return ptr;
+  }
 
 } // namespace memoryPool

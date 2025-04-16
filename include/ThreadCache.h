@@ -4,7 +4,7 @@
 namespace Kama_memoryPool {
 
 // 线程本地缓存
-  class ThreadCache {
+  class ThreadCache { // 为什么有的函数是public，有的是private ？
   public:
       static ThreadCache* getInstance() {
       static thread_local ThreadCache instance;
