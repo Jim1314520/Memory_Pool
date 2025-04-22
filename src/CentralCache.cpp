@@ -78,7 +78,7 @@ static const size_t SPAN_PAGES = 8;
                   count++;
               }
 
-              if (prev) // 当前centralFreeList_[index]链表上的内存块大于batchNum时需要用到 
+              if (prev) // 当前centralFreeList_[index]链表上的内存块大于batchNum时需要用到  
               {
                   *reinterpret_cast<void**>(prev) = nullptr;
               }
@@ -98,11 +98,10 @@ static const size_t SPAN_PAGES = 8;
 
     void CentralCache::returnRange(void* start, size_t size, size_t index) {
         // 当索引大于等于FREE_LIST_SIZE时，说明内存过大应直接向系统归还
-        if (!start || index >= FREE_LIST_SIZE) 
+        if (!start || index >= FREE_LIST_SIZE)  // index表示的是多大的内存，size表示块的数量
             return;
 
-        while (locks_[index].test_and_set(std::memory_order_acquire)) 
-        {
+        while (locks_[index].test_and_set(std::memory_order_acquire)) {
             std::this_thread::yield();
         }
 

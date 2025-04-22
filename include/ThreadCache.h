@@ -7,14 +7,14 @@ namespace Kama_memoryPool {
   class ThreadCache { // 为什么有的函数是public，有的是private ？
   public:
       static ThreadCache* getInstance() {
-      static thread_local ThreadCache instance;
+      static thread_local ThreadCache instance; // 表示该变量是线程私有的 
       return &instance;
       }
 
       void* allocate(size_t size);
       void deallocate(void* ptr, size_t size);
   private:
-      ThreadCache() = default;
+      ThreadCache() = default; // 为什么这里是default ？
       // 从中心缓存获取内存
       void* fetchFromCentralCache(size_t index);
       // 归还内存到中心缓存

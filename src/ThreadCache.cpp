@@ -21,7 +21,7 @@ namespace Kama_memoryPool {
 
       // 检查线程本地自由链表
       // 如果 freeList_[index] 不为空，表示该链表中有可用内存块
-      if (void* ptr = freeList_[index]) {
+      if (void* ptr = freeList_[index]) { // 每个地址块都存储着下一个地址块的地址
           freeList_[index] = *reinterpret_cast<void**>(ptr); // 将freeList_[index]指向的内存块的下一个内存块地址（取决于内存块的实现）
           return ptr;
       }
@@ -64,10 +64,20 @@ namespace Kama_memoryPool {
       size_t batchNum = getBatchNum(size);
       // 从中心缓存批量获取内存
       void* start = CentralCache::getInstance().fetchRange(index, batchNum);
+      
       if (!start) return nullptr;
+        // **① 精确遍历一次，算出实际拿到的块数 actualCount：**
+        size_t actualCount = 0;
+        for (void* p = start; p != nullptr; p = *reinterpret_cast<void**>(p)) {
+            ++actualCount;
+        }
+
+        // **② 用 actualCount 更新计数，而不是 batchNum：**
+        freeListSize_[index] += actualCount;
+
 
       // 更新自由链表大小
-      freeListSize_[index] += batchNum; // 增加对应大小类的自由链表大小
+  //    freeListSize_[index] += batchNum; // 增加对应大小类的自由链表大小
 
       // 取一个返回，其余放入线程本地自由链表
       void* result = start;
@@ -78,7 +88,7 @@ namespace Kama_memoryPool {
       return result;
   }
 
-  void ThreadCache::returnToCentralCache(void* start, size_t size) {
+  void ThreadCache::returnToCentralCache(void* start, size_t size) { // 归还多余的内存
       // 根据大小计算对应的索引
       size_t index = SizeClass::getIndex(size);
 
@@ -86,7 +96,7 @@ namespace Kama_memoryPool {
       size_t alignedSize = SizeClass::roundUp(size);
 
       // 计算要归还内存块数量
-      size_t batchNum = freeListSize_[index];
+      size_t batchNum = freeListSize_[index]; // 拿到该节点还有多少块内存
       if (batchNum <= 1) return; // 如果只有一个块，则不归还
 
       // 保留一部分在ThreadCache中（比如保留1/4）
@@ -97,11 +107,9 @@ namespace Kama_memoryPool {
       char* current = static_cast<char*>(start);
       // 使用对齐后的大小计算分割点
       char* splitNode = current;
-      for (size_t i = 0; i < keepNum - 1; ++i) 
-      {
+      for (size_t i = 0; i < keepNum - 1; ++i) { // 循环找到保留的链表位置
           splitNode = reinterpret_cast<char*>(*reinterpret_cast<void**>(splitNode));
-          if (splitNode == nullptr) 
-          {
+          if (splitNode == nullptr) {
               // 如果链表提前结束，更新实际的返回数量
               returnNum = batchNum - (i + 1);
               break;
@@ -120,8 +128,7 @@ namespace Kama_memoryPool {
         freeListSize_[index] = keepNum;
 
         // 将剩余部分返回给CentralCache
-        if (returnNum > 0 && nextNode != nullptr)
-        {
+        if (returnNum > 0 && nextNode != nullptr) {
             CentralCache::getInstance().returnRange(nextNode, returnNum * alignedSize, index);
         }
     }

@@ -34,8 +34,7 @@ void testBasicAllocation()
 }
 
 // 内存写入测试
-void testMemoryWriting() 
-{
+void testMemoryWriting() {
     std::cout << "Running memory writing test..." << std::endl;
 
     // 分配并写入数据

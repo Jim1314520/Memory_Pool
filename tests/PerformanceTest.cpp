@@ -60,9 +60,8 @@ public:
     }
 
     // 2. 小对象分配测试
-    static void testSmallAllocation() 
-    {
-        constexpr size_t NUM_ALLOCS = 10000000; // 修改次数 100000 ->  10000000
+    static void testSmallAllocation() {
+        constexpr size_t NUM_ALLOCS = 20000000; // 修改次数 100000 ->  10000000
         constexpr size_t SMALL_SIZE = 32;
         
         std::cout << "\nTesting small allocations (" << NUM_ALLOCS << " allocations of " 
@@ -126,7 +125,7 @@ public:
     static void testMultiThreaded() 
     {
         constexpr size_t NUM_THREADS = 8; // 4 -> 8
-        constexpr size_t ALLOCS_PER_THREAD = 25000; //  25000 -> 1000000
+        constexpr size_t ALLOCS_PER_THREAD = 1000000; //  25000 -> 1000000
         constexpr size_t MAX_SIZE = 256;
         
         std::cout << "\nTesting multi-threaded allocations (" << NUM_THREADS 
