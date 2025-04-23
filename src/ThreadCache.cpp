@@ -64,7 +64,7 @@ namespace Kama_memoryPool {
       size_t batchNum = getBatchNum(size);
       // 从中心缓存批量获取内存
       void* start = CentralCache::getInstance().fetchRange(index, batchNum);
-      
+
       if (!start) return nullptr;
         // **① 精确遍历一次，算出实际拿到的块数 actualCount：**
         size_t actualCount = 0;
@@ -77,7 +77,7 @@ namespace Kama_memoryPool {
 
 
       // 更新自由链表大小
-  //    freeListSize_[index] += batchNum; // 增加对应大小类的自由链表大小
+      //    freeListSize_[index] += batchNum; // 增加对应大小类的自由链表大小
 
       // 取一个返回，其余放入线程本地自由链表
       void* result = start;

@@ -15,8 +15,7 @@ void* PageCache::allocateSpan(size_t numPages) {
         Span* span = it->second;
 
         // 将取出的span从原有的空闲链表freeSpans_[it->first]中移除
-        if (span->next)
-        {
+        if (span->next) {
             freeSpans_[it->first] = span->next;
         }
         else
@@ -75,8 +74,7 @@ void PageCache::deallocateSpan(void* ptr, size_t numPages)
     void* nextAddr = static_cast<char*>(ptr) + numPages * PAGE_SIZE;
     auto nextIt = spanMap_.find(nextAddr);
     
-    if (nextIt != spanMap_.end())
-    {
+    if (nextIt != spanMap_.end()) {
         Span* nextSpan = nextIt->second;
         
         // 1. 首先检查nextSpan是否在空闲链表中

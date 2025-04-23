@@ -27,3 +27,7 @@ add_executable(perf_test
     tests/PerformanceTest.cpp
 )
 target_link_libraries(perf_test pthread)
+
+# 跨线程释放测试
+add_executable(cross_thread_test ${MEMPOOL_SRC} tests/cross_thread_test.cpp)
+target_link_libraries(cross_thread_test pthread)

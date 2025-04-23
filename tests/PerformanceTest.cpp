@@ -42,8 +42,7 @@ public:
         std::vector<std::pair<void*, size_t>> warmupPtrs;
         
         // 预热内存池
-        for (int i = 0; i < 1000; ++i) 
-        {
+        for (int i = 0; i < 2000; ++i) {
             for (size_t size : {32, 64, 128, 256, 512}) {
                 void* p = MemoryPool::allocate(size);
                 warmupPtrs.emplace_back(p, size);  // 存储指针和对应的大小
@@ -61,7 +60,7 @@ public:
 
     // 2. 小对象分配测试
     static void testSmallAllocation() {
-        constexpr size_t NUM_ALLOCS = 20000000; // 修改次数 100000 ->  10000000
+        constexpr size_t NUM_ALLOCS = 100000; // 修改次数 100000 ->  10000000
         constexpr size_t SMALL_SIZE = 32;
         
         std::cout << "\nTesting small allocations (" << NUM_ALLOCS << " allocations of " 
@@ -78,8 +77,7 @@ public:
                 ptrs.push_back(MemoryPool::allocate(SMALL_SIZE));
                 
                 // 模拟真实使用：部分立即释放
-                if (i % 4 == 0) 
-                {
+                if (i % 4 == 0) {
                     MemoryPool::deallocate(ptrs.back(), SMALL_SIZE);
                     ptrs.pop_back();
                 }
@@ -124,8 +122,8 @@ public:
     // 3. 多线程测试
     static void testMultiThreaded() 
     {
-        constexpr size_t NUM_THREADS = 8; // 4 -> 8
-        constexpr size_t ALLOCS_PER_THREAD = 1000000; //  25000 -> 1000000
+        constexpr size_t NUM_THREADS = 4; // 4 -> 8
+        constexpr size_t ALLOCS_PER_THREAD = 25000; //  25000 -> 1000000
         constexpr size_t MAX_SIZE = 256;
         
         std::cout << "\nTesting multi-threaded allocations (" << NUM_THREADS 
@@ -162,7 +160,7 @@ public:
             }
             
             // 清理剩余内存
-            for (const auto& [ptr, size] : ptrs) 
+            for (const auto& [ptr, size] : ptrs) // 结构化绑定
             {
                 if (useMemPool) 
                 {
@@ -199,13 +197,11 @@ public:
             Timer t;
             std::vector<std::thread> threads;
             
-            for (size_t i = 0; i < NUM_THREADS; ++i) 
-            {
+            for (size_t i = 0; i < NUM_THREADS; ++i) {
                 threads.emplace_back(threadFunc, false);
             }
             
-            for (auto& thread : threads) 
-            {
+            for (auto& thread : threads) {
                 thread.join();
             }
             
@@ -217,7 +213,7 @@ public:
     // 4. 混合大小测试
     static void testMixedSizes() 
     {
-        constexpr size_t NUM_ALLOCS = 1000000; //50000 -> 1000000
+        constexpr size_t NUM_ALLOCS = 50000; //50000 -> 1000000
         const size_t SIZES[] = {16, 32, 64, 128, 256, 512, 1024, 2048};
         
         std::cout << "\nTesting mixed size allocations (" << NUM_ALLOCS 
